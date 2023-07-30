@@ -17,6 +17,7 @@ user_route.use(bodyParser.urlencoded({extended:true}));
 //     methods: "*",
 //     allowedHeaders:"*"
 // }));
+var accounts = [];
 
 user_route.use(session({
   secret: con.sessionSecret,
@@ -85,21 +86,20 @@ user_route.post('/login', auth.isLogin, userController.login);
 user_route.get('/register', auth.isLogin, async (req, res)=>{
  res.render('register'); 
 });
-user_route.post('/register',auth.isLogin, userController.sendMailVerify)
+user_route.post('/register',auth.isLogin, userController.sendMailVerify);
 
-user_route.post('/verify',auth.isLogin,userController.MailVerify)
-
-user_route.get('/account',auth.isLogout, async (req, res)=>{
-  res.send('Service is comming soon');
-});
+user_route.get('/account',auth.isLogout,auth.isAdmin, userController.loadAccounts);
 
 user_route.get('/student', (req, res)=>{
   res.render('student',{courses:[{name:"Programing"},{name:"other Courses"}]});
 });
 user_route.post('/student',upload.any(),uploadToFTP,userController.studentUpload);
 
-user_route.get('/pannel',auth.isLogout,userController.pannelLoad);
+user_route.get('/pannel',auth.isLogout,auth.isAdmin, userController.pannelLoad);
 
+user_route.post('/makeAdmin',auth.isLogout,auth.isAdmin,userController.makeAdmin);
+user_route.post('/removeAdmin',auth.isLogout,auth.isAdmin,userController.removeAdmin);
+user_route.post('/changePassword',auth.isLogout,auth.isAdmin, userController.changePassword);
 
 user_route.get('/keepAlive', (req, res)=>{
   console.log('Status checked, clear');

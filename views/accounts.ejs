@@ -100,51 +100,60 @@
                 </div>
               </nav>
         </div>
-        <div class="row " style="min-height: 500px; background: rgba(255, 255, 255, 0.774);">
-          <div class="col-sm-3">
-            <h3>Dates</h3>
-            <% if (typeof days !== 'undefined') { %>
-              <div class="card" id="courseList">
-                <ul class="list-group list-group-flush">
-                  <% days.forEach(day => { %>
-                    <li class="list-group-item"><%= day.day %></li>
-                  <% }) %>
-                    <!-- <p  class="list-group-item">No courses</p> -->
-                </ul>
-              </div>
-            <% } else { %>
-              <p class="text-danger">No Submission Dates yet.</p>
-            <% } %>
-            <h3>Add Course</h3>
-            <p>To add more corses please follow this link: <a href="/account">Accounts</a></p>
-          </div>
-          <div class="col-sm-9">
-            <h3>Work</h3>
-            <% if (typeof files !== 'undefined') { %>
-             <% files.forEach(file => { %>
-              <details>
-                <summary><%= file.studentN %> - <%= file.student %></summary>
-                <div class="div <%= file.day %>">
-                  <div class="col">
-                    <div class="card">
-                      <div class="card-header">
-                        <%= file.student %> 
-                      </div>
-                      <div class="card-body">
-                        <h5 class="card-title"><%= file.course %></h5>
-                        <ul>
-                        <% file.files.forEach(f => { %>
-                         <li><%= f %></li><a target="_blank" href="http://lugandahymnalnew.infinityfreeapp.com/uploads/<%= f %>" download="<%= f %>">Download</a>
-                        <% }) %>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+        <h2>Control Pannel</h2>
+        <div class="row " style="min-height: 500px;">
+          <details class="bg-light text-dark p-1">
+            <summary class="bg-dark text-light p-2 rounded">Manage Accounts</summary>
+          <div class="col-10">
+            <% if (typeof eData !== 'undefined') { %>
+             <% eData.forEach(e => { %>
+              <details class="bg-light rounded p-2">
+                <summary class="bg-dark text-light p-1 rounded"><%= e.LName %> - <%= e.email %></summary>
+                <% if (e.admin) { %>
+                 <form action="/removeAdmin" method="post">
+                    <input type="email" value="<%= e.email %>" name="email" style="display: none;">
+                    <input class="btn btn-danger" type="submit" value="Remove Adminstrator Previlleges.">
+                 </form>
+                <% } else { %>
+                 <form action="/makeAdmin" method="post">
+                    <input type="email" value="<%= e.email %>" name="email" style="display: none;">
+                    <input class="btn btn-success m-1" type="submit" value="Give Adminstrator Previlleges.">
+                 </form>
+                <% } %>
               </details>
              <% }) %>
             <% } %>
           </div>
+          </details>
+          <details class="bg-light text-dark p-1">
+            <summary class="bg-dark text-light p-2 rounded">Change Password</summary>
+            <% if (typeof user !== 'undefined') { %>
+           
+                <form action="/changePassword" method="post" class="f">
+                    <div class="row">
+                        <div class="mb-3" style="display: none;">
+                            <label for="email" class="form-label">Email address</label>
+                            <input type="email" value="<%= user.email %>" class="form-control" id="email" name="email" aria-describedby="emailHelp" required>
+                            <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+                          </div>
+                          <div class="mb-3">
+                            <label for="password" class="form-label">Old Password</label>
+                            <input type="password" class="form-control" id="oldPass" name="oldPass" required>
+                          </div>
+                          <div class="mb-3">
+                            <label for="password" class="form-label">New Password</label>
+                            <input type="password" class="form-control" id="password" onchange="checkpass()" name="password" required>
+                          </div>
+                          <div class="mb-3">
+                            <label for="ppassword" class="form-label">Confirm New Password</label>
+                            <input type="password"  class="form-control" id="ppassword" onchange="checkpass()" required>
+                            <p id="p"></p>
+                          </div>
+                            <input type="submit" value="Register" class="btn btn-primary" id="btn-s" disabled>
+                    </div>
+                </form>
+              <% } %>
+          </details>
         </div>
         <% if (typeof message !== 'undefined') { %>
         <div class="over">
@@ -157,7 +166,7 @@
                 <h5 class="card-title">Message</h5>
                 <p class="card-text"><%= message %></p>
               </div>
-              <button style="margin: 0 auto;" class="btn btn-danger" onclick="btnClose()">Back to home</button>
+              <button style="margin: 0 auto;" class="btn btn-danger" onclick="btnClose()">Refresh</button>
               <br>
             </div>
           </div>
@@ -172,9 +181,27 @@
     <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
    <script>
+    function checkpass(){
+     var pass = document.getElementById('password');
+     var pass1 = document.getElementById('ppassword');
+     var p = document.getElementById('p');
+     var b = document.getElementById('btn-s');
+
+     if(pass.value == pass1.value){
+       p.className = "text-success"
+       b.disabled = false;
+       p.innerText = "You have confirmed your password successfully";
+     }
+     else{
+       p.className = "text-danger"
+       p.innerText = "Passwords dont match";
+       b.disabled = true;
+     }
+   }
+   
     function btnClose(){
         $('.over').css('display','none');
-        window.location.href = '/'
+        window.location.href = '/account';
       }
    </script>
 </body>

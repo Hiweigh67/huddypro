@@ -9,6 +9,7 @@ const isLogin = async (req,res,next)=>{
         }
     } catch (err) {
         console.log(err.message);
+        res.render('error',{error:err.message});
     }
 }
 
@@ -22,10 +23,26 @@ const isLogout = async (req,res,next)=>{
         }
     } catch (err) {
         console.log(err.message);
+        res.render('error',{error:err.message});
+    }
+}
+
+const isAdmin = async (req,res,next)=>{
+    try {
+        if(req.session.user.admin){
+            next();
+        }
+        else{
+            res.render('home',{message:"You are not an administrator."});
+        }
+    } catch (err) {
+        console.log(err.message);
+        res.render('error',{error:err.message});
     }
 }
 
 module.exports = {
     isLogin,
-    isLogout
+    isLogout,
+    isAdmin
 }

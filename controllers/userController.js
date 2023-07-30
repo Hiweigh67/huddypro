@@ -150,7 +150,7 @@ const login = async (req, res)=>{
                 const checkPassword = await bcrypt.compare(req.body.password,checkUser.listing.password);
                 if(checkPassword){
                     req.session.user = checkUser.listing
-                    console.log(req.session.user)
+                    // console.log(req.session.user)
                     res.redirect('/');
                 }
                 else{
@@ -244,7 +244,7 @@ const pannelLoad = async (req,res)=>{
             await validateV();
             res.render('pannel',{days:days.listings,files:files.listings,user:req.session.user});
         }else{
-            res.render('pannel',{Message:"This section can be accessed only by Administrators"});
+            res.render('pannel',{message:"This section can be accessed only by Administrators",user:""});
         }
     } catch (error) {
         res.render('error',{error:error.message});
@@ -313,6 +313,68 @@ const MailVerify = async (req,res)=>{
     }
 }
 
+const makeAdmin = async (req, res)=>{
+    try {
+        const ck = await db.readRow({email:req.body.email},'huddypro','users');
+        if(ck.found){
+            if(ck.listing.admin){
+                res.render('accounts',{user:"",message:"User is already Admin"});
+            }else{
+                await db.updateRow2({email:req.body.email},{admin:true},'huddypro','users');
+                res.render('accounts',{user:"",message:"User is now admin"});
+            }
+        }
+        else{
+            res.render('accounts',{message:"The email is not in the database of accounts.",user:""})
+        }
+    } catch (error) {
+        res.render('error',{error:error.message});
+    }
+}
+const removeAdmin = async (req, res)=>{
+    try {
+        const ck = await db.readRow({email:req.body.email},'huddypro','users');
+        if(ck.found){
+            if(ck.listing.admin){
+                await db.updateRow2({email:req.body.email},{admin:false},'huddypro','users');
+                res.render('accounts',{user:"",message:"User is now not and admin."});
+            }else{
+                res.render('accounts',{user:"",message:"User is not an admin."});
+            }
+        }
+        else{
+            res.render('accounts',{message:"The email is not in the database of accounts.",user:""})
+        }
+    } catch (error) {
+        res.render('error',{error:error.message});
+    }
+}
+
+const changePassword = async (req, res)=>{
+    try {
+        var checkUser = await db.readRow({email:req.body.email},"huddypro","users");
+        if(checkUser.found){
+            const checkPassword = await bcrypt.compare(req.body.oldPass,checkUser.listing.password);
+            if(checkPassword){
+                const newPass = await bcrypt.hash(req.body.password, 10);
+                await db.updateRow({email:req.body.email},{password:newPass},'huddypro','users')
+                // console.log(req.session.user)
+                res.render('accounts',{message:"Password was changed Successfully."})
+            }
+            else{
+                res.render('accounts',{message:"Invalid old Password"});
+            }
+        }
+        else{
+            console.log(checkUser);
+            res.render('login',{message:"Account doesn't exist",login:"",fData:req.body});
+        }
+    } catch (error) {
+        console.log(error.message);
+        res.render('error',{error:error.message});
+    }
+}
+
 const addStudent = async (req, res)=> {
     try {
         const ck = await db.readRow({studentN:req.body.studentN},'huddypro','students');
@@ -326,8 +388,19 @@ const addStudent = async (req, res)=> {
         res.render('error',{error:error.message});
     }
 }
+const loadAccounts = async (req, res)=>{
+    try {
+        var accounts = await db.readRows({},'huddypro','users');
+        res.render('accounts',{eData:accounts.listings,user:req.session.user});
+    } catch (error) {
+        res.render('error',{error:error.message});
+    }
+  }
 module.exports = {
     register,
+    loadAccounts,
+    changePassword,
+    addStudent,
     loadLogin,
     login,
     logout,
@@ -336,5 +409,7 @@ module.exports = {
     pannelLoad,
     sendMailVerify,
     studentCheck,
-    MailVerify
+    MailVerify,
+    makeAdmin,
+    removeAdmin
 }
