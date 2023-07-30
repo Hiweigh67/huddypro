@@ -1,0 +1,5 @@
+Doble click en MegaBasterd.bat y listo.
+
+
+
+ACTUALIZACIÓN: para actualizar basta con descargar la nueva versión del archivo .jar y cambiarla por la antigua que está en la carpeta jar (sin olvidar renombrar la nueva a "MegaBasterd.jar").
