@@ -7,8 +7,8 @@ const nodemailer = require('nodemailer');
     port: 465,
     secure: true,
     auth: {
-        user: 'kitahope@yandex.ru',
-        pass: '0757@Janerogz'
+        user: 'kitahope@yandex.com',
+        pass: 'wdahdbvduvyuroft'
       }
   });
   
