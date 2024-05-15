@@ -284,8 +284,8 @@ const sendMailVerify = async (req,res)=>{
                 res.render('emailVery',{fData:cj.listing});
             }
             else{
-                await db.createListing(req.body,'huddypro','users');
                 await sendVMail.sendEmail(mailOptions);
+                await db.createListing(req.body,'huddypro','users');
                 res.render('emailVery',{fData:req.body});
             }
         }
