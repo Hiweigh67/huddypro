@@ -101,6 +101,9 @@ user_route.post('/makeAdmin',auth.isLogout,auth.isAdmin,userController.makeAdmin
 user_route.post('/removeAdmin',auth.isLogout,auth.isAdmin,userController.removeAdmin);
 user_route.post('/changePassword',auth.isLogout,auth.isAdmin, userController.changePassword);
 
+// confirm user
+user_route.post('/verify', auth.isLogin, userController.MailVerify);
+
 user_route.get('/keepAlive', (req, res)=>{
   console.log('Status checked, clear');
   res.send("hlo");
